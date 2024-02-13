@@ -9,7 +9,7 @@
       google.charts.setOnLoadCallback(drawHistogram);
 
       function drawHistogram() {
-        fetch('/paris/')  // Assurez-vous que cette route retourne les données météo pour Paris
+        fetch('/histogramme/')  // Assurez-vous que cette route retourne les données météo pour Paris
           .then(response => response.json())
           .then(data => {
             var dataTable = new google.visualization.DataTable();
