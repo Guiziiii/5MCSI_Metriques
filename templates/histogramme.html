@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Températures - Histogramme</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        fetch('/tawarano/')
+          .then(response => response.json())
+          .then(data => {
+            var dataTable = new google.visualization.DataTable();
+            dataTable.addColumn('string', 'Date');
+            dataTable.addColumn('number', 'Température');
+
+            data.results.forEach(entry => {
+              // Convertit le timestamp UNIX en date lisible
+              var date = new Date(entry.Jour * 1000);
+              // Ajoute chaque entrée de date et température dans le tableau de données
+              dataTable.addRow([date.toLocaleDateString(), entry.temp]);
+            });
+
+            var options = {
+              title: 'Histogramme des Températures',
+              legend: { position: 'none' },
+              hAxis: { title: 'Date' },
+              vAxis: { title: 'Température (°C)' },
+              histogram: { lastBucketPercentile: 5 }
+            };
+
+            // Dessine l'histogramme avec les données et options définies
+            var chart = new google.visualization.Histogram(document.getElementById('chart_div'));
+            chart.draw(dataTable, options);
+          })
+          .catch(error => {
+            console.error('Error fetching data: ', error);
+            document.getElementById('chart_div').innerHTML = 'Unable to retrieve data.';
+          });
+      }
+    </script>
+  </head>
+  <body>
+    <div id="chart_div" style="width: 900px; height: 500px;"></div>
+  </body>
+</html>
