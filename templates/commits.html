@@ -1,0 +1,32 @@
+from flask import Flask, jsonify, render_template
+import requests
+from datetime import datetime
+
+app = Flask(__name__)
+
+# ...
+
+@app.route('/commits/')
+def commits():
+    # Étape 2: Récupérer les données de l'API GitHub
+    response = requests.get('https://api.github.com/repos/OpenRSI/5MCSI_Metriques/commits')
+    commits_data = response.json()
+
+    # Étape 3: Extraire les données nécessaires
+    commit_times = [commit['commit']['author']['date'] for commit in commits_data]
+
+    # Étape 4: Préparer les données pour le graphique
+    # (Ici vous pouvez compter les commits par minute, par heure, etc.)
+    commit_count = {}
+    for commit_time in commit_times:
+        date_object = datetime.strptime(commit_time, '%Y-%m-%dT%H:%M:%SZ')
+        minute = date_object.strftime('%Y-%m-%d %H:%M')
+        if minute not in commit_count:
+            commit_count[minute] = 0
+        commit_count[minute] += 1
+
+    # Convertir en format utilisable par le graphique
+    commit_list = [{'time': minute, 'count': count} for minute, count in commit_count.items()]
+
+    # Étape 5: Envoyer les données au template HTML
+    return render_template('commits.html', commit_data=commit_list)
