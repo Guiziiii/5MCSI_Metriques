@@ -39,4 +39,8 @@ def mongraphique():
 def mameteo():
     return render_template("histogramme.html")
 
+@app.route("/commits/")
+def mongraphique():
+    return render_template("commits.html")
+
 
